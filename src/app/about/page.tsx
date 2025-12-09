@@ -16,6 +16,7 @@ import {
   FaReact,
   FaVuejs,
   FaYarn,
+  FaCheck,
 } from "react-icons/fa6";
 import {
   RiFirebaseFill,
@@ -34,6 +35,7 @@ import {
   SiVisualstudiocode,
 } from "react-icons/si";
 import { VscCode } from "react-icons/vsc";
+import { MdContentCopy } from "react-icons/md";
 
 // @ts-ignore
 import { Splide, SplideSlide } from "@splidejs/react-splide";
@@ -229,9 +231,17 @@ const TOOLS = [
 
 function Page() {
   const [toolsLoaded, setToolsLoaded] = useState(false);
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
   useEffect(() => {
     setToolsLoaded(true);
   }, []);
+
+  const handleCopyLink = (content: string, index: number) => {
+    navigator.clipboard.writeText(content);
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 2000);
+  };
   return (
     <div className="container mx-auto px-4 md:px-[50px] xl:px-[200px] text-zinc-300 pt-20 pb-20">
       <div className="flex flex-col lg:flex-row gap-5">
@@ -260,19 +270,33 @@ function Page() {
             <div className="hidden lg:block">
               <hr className="my-10 border-zinc-600" />
               <ul className="flex flex-col gap-3">
-                {CONTACT_LINKS.map((link) => (
-                  <li key={link.name}>
+                {CONTACT_LINKS.map((link, index) => (
+                  <li key={link.name} className="relative">
                     <a
-                      className="flex items-center px-3 gap-3 w-full h-12 border-zinc-700 bg-zinc-800 hover:border-zinc-600 border-[.5px] rounded-md "
+                      className="flex items-center px-3 gap-3 w-full h-12 border-zinc-700 bg-zinc-800 hover:border-zinc-600 border-[.5px] rounded-md group"
                       href={link.href}
                     >
                       <div className="w-8">{link.icon}</div>
-                      <div className="flex flex-col">
+                      <div className="flex flex-col flex-1">
                         <div className="text-sm">{link.name}</div>
                         <div className="text-xs text-zinc-500">
                           {link.content}
                         </div>
                       </div>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleCopyLink(link.content, index);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-zinc-700 rounded"
+                        title="Copy to clipboard"
+                      >
+                        {copiedIndex === index ? (
+                          <FaCheck size={16} className="text-green-500" />
+                        ) : (
+                          <MdContentCopy size={16} className="text-zinc-400" />
+                        )}
+                      </button>
                     </a>
                   </li>
                 ))}
